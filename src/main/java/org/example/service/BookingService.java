@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * BookingService contains the core booking logic and time slot validation rules.
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 public class BookingService {
     private final BookingDao bookingDao;
     private final UserDao userDao;
+    private static final int CANCELLATION_CUTOFF_HOURS = 12;
 
     public BookingService() {
         this.bookingDao = new BookingDao();
@@ -71,5 +73,46 @@ public class BookingService {
         if (d.toHours() > 4) {
             throw new IllegalArgumentException("Maximum booking duration is 4 hours");
         }
+    }
+
+    public List<Booking> getBookingsForUser(String email) throws SQLException {
+        List<Booking> bookings = bookingDao.findBookingsByUserEmail(email);
+        // Set the transient 'cancellable' flag based on business rules
+        for (Booking booking : bookings) {
+            boolean isCancellable = "CONFIRMED".equals(booking.getStatus()) &&
+                    LocalDateTime.now().isBefore(booking.getStartTime().minusHours(CANCELLATION_CUTOFF_HOURS));
+            booking.setCancellable(isCancellable);
+        }
+        return bookings;
+    }
+
+    public void cancelBooking(long bookingId, String userEmail) throws SQLException, SecurityException {
+        User user = userDao.findByEmail(userEmail);
+        if (user == null) {
+            throw new SecurityException("User not found.");
+        }
+
+        Booking booking = bookingDao.findById(bookingId);
+        if (booking == null) {
+            throw new IllegalArgumentException("Booking not found.");
+        }
+
+        // Security check: ensure the user owns this booking
+        if (!booking.getUserId().equals(user.getId())) {
+            throw new SecurityException("You are not authorized to cancel this booking.");
+        }
+
+        // Business rule check: status must be confirmed
+        if (!"CONFIRMED".equals(booking.getStatus())) {
+            throw new IllegalStateException("This booking cannot be cancelled as it is not confirmed.");
+        }
+
+        // Business rule check: must be before the cutoff time
+        if (LocalDateTime.now().isAfter(booking.getStartTime().minusHours(CANCELLATION_CUTOFF_HOURS))) {
+            throw new IllegalStateException("Cancellation is only allowed up to " + CANCELLATION_CUTOFF_HOURS + " hours before the booking time.");
+        }
+
+        // All checks passed, proceed to cancel
+        bookingDao.updateStatus(bookingId, user.getId(), "CANCELLED");
     }
 }

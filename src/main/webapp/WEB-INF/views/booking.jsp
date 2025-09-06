@@ -12,6 +12,10 @@
 <body>
 <header class="navbar">
     <div class="brand">APEX TURF</div>
+    <nav class="nav-links">
+        <%-- Use the consistent .nav-link class --%>
+        <a href="${pageContext.request.contextPath}/my-bookings" class="nav-link">My Bookings</a>
+    </nav>
 </header>
 <main class="container">
     <section class="card">
