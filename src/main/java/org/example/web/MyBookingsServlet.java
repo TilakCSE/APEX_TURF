@@ -5,7 +5,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.example.model.Booking;
+import org.example.model.User;
 import org.example.service.BookingService;
 
 import java.io.IOException;
@@ -18,42 +20,33 @@ public class MyBookingsServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        HttpSession session = req.getSession();
+        User user = (User) session.getAttribute("user");
+        req.setAttribute("currentPage", "my-bookings"); // <-- ADD THIS LINE
+
+        try {
+            List<Booking> bookings = bookingService.getBookingsForUser(user.getId());
+            req.setAttribute("bookings", bookings);
+        } catch (Exception e) {
+            req.setAttribute("errorMessage", "Error fetching your bookings: " + e.getMessage());
+        }
         req.getRequestDispatcher("/WEB-INF/views/my-bookings.jsp").forward(req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String action = req.getParameter("action");
-        String email = req.getParameter("email");
+        HttpSession session = req.getSession();
+        User user = (User) session.getAttribute("user");
 
         try {
-            if ("lookup".equals(action)) {
-                // Just lookup, no success/error message needed unless it fails
-            } else if ("cancel".equals(action)) {
-                long bookingId = Long.parseLong(req.getParameter("bookingId"));
-                bookingService.cancelBooking(bookingId, email);
-                req.setAttribute("successMessage", "Booking #" + bookingId + " has been cancelled successfully.");
-            }
-
-            // For both actions, we need to reload the booking list to show the latest state
-            if (email != null && !email.isEmpty()) {
-                List<Booking> bookings = bookingService.getBookingsForUser(email);
-                req.setAttribute("bookings", bookings);
-                req.setAttribute("lookupEmail", email); // To pre-fill the form
-            }
-
+            long bookingId = Long.parseLong(req.getParameter("bookingId"));
+            // CORRECTED: Cancel booking using the logged-in user's ID
+            bookingService.cancelBooking(bookingId, user.getId());
+            req.setAttribute("successMessage", "Booking #" + bookingId + " has been cancelled successfully.");
         } catch (Exception e) {
             req.setAttribute("errorMessage", "Error: " + e.getMessage());
-            // If an error occurs, we still want to show the existing list if possible
-            try {
-                if (email != null && !email.isEmpty()) {
-                    List<Booking> bookings = bookingService.getBookingsForUser(email);
-                    req.setAttribute("bookings", bookings);
-                    req.setAttribute("lookupEmail", email);
-                }
-            } catch (Exception ignored) {}
         }
-
-        req.getRequestDispatcher("/WEB-INF/views/my-bookings.jsp").forward(req, resp);
+        // After processing, reload the page by calling the GET handler
+        doGet(req, resp);
     }
 }

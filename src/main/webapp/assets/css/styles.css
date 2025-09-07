@@ -54,6 +54,7 @@ body {
     backdrop-filter: blur(8px);
     z-index: 10;
 }
+.nav-welcome { color: var(--muted); margin-right: 16px; }
 
 .brand {
     font-weight: 700;
@@ -80,9 +81,12 @@ body {
 }
 
 
+/* Add this to your CSS file, for example, after the .nav-link:hover rule */
 .nav-link.active {
-    background-color: var(--primary);
-    color: #fff;
+    color: var(--primary);
+    background: rgba(79, 70, 229, 0.15);
+    border-color: rgba(79, 70, 229, 0.4);
+    pointer-events: none; /* Makes the active link not clickable */
 }
 
 /* === Forms & Buttons === */

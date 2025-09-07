@@ -13,18 +13,18 @@ public class UserDao {
     private final DataSource dataSource = DatabaseConfig.getDataSource();
 
     public User findByEmail(String email) throws SQLException {
-        String sql = "SELECT id, name, email, phone FROM users WHERE email = ?";
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        String sql = "SELECT id, name, email, phone, password FROM users WHERE email = ?";
+        try (Connection conn = dataSource.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, email);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    User u = new User();
-                    u.setId(rs.getLong("id"));
-                    u.setName(rs.getString("name"));
-                    u.setEmail(rs.getString("email"));
-                    u.setPhone(rs.getString("phone"));
-                    return u;
+                    return new User(
+                            rs.getLong("id"),
+                            rs.getString("name"),
+                            rs.getString("email"),
+                            rs.getString("phone"),
+                            rs.getString("password")
+                    );
                 }
             }
         }
@@ -32,19 +32,19 @@ public class UserDao {
     }
 
     public long create(User user) throws SQLException {
-        String sql = "INSERT INTO users (name, email, phone) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO users (name, email, phone, password) VALUES (?, ?, ?, ?)";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, user.getName());
             ps.setString(2, user.getEmail());
             ps.setString(3, user.getPhone());
+            ps.setString(4, user.getPassword()); // Add password
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
-                if (rs.next()) {
-                    return rs.getLong(1);
-                }
+                if (rs.next()) { return rs.getLong(1); }
             }
         }
         throw new SQLException("Failed to insert user, no ID returned");
     }
 }
+

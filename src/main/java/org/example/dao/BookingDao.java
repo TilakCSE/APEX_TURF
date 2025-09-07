@@ -119,4 +119,27 @@ public class BookingDao {
                 rs.getTimestamp("created_at").toLocalDateTime()
         );
     }
+
+    public List<Booking> findBookingsByUserId(long userId) throws SQLException {
+        List<Booking> bookings = new ArrayList<>();
+        String sql = "SELECT b.*, t.name as turf_name, s.name as sport_name " +
+                "FROM bookings b " +
+                "JOIN turfs t ON b.turf_id = t.id " +
+                "JOIN sports s ON b.sport_id = s.id " +
+                "WHERE b.user_id = ? " +
+                "ORDER BY b.start_time DESC";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Booking booking = mapRowToBooking(rs);
+                    booking.setTurfName(rs.getString("turf_name"));
+                    booking.setSportName(rs.getString("sport_name"));
+                    bookings.add(booking);
+                }
+            }
+        }
+        return bookings;
+    }
 }

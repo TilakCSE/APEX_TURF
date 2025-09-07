@@ -8,6 +8,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.example.dao.SportDao;
 import org.example.dao.TurfDao;
 import org.example.service.BookingService;
+import org.example.model.User;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -29,6 +31,7 @@ public class BookingServlet extends HttpServlet {
         try {
             req.setAttribute("turfs", turfDao.findAllActive());
             req.setAttribute("sports", sportDao.findAllActive());
+            req.setAttribute("currentPage", "booking"); // <-- ADD THIS LINE
         } catch (Exception e) {
             req.setAttribute("error", "Failed to load data: " + e.getMessage());
         }
@@ -37,37 +40,35 @@ public class BookingServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        HttpSession session = req.getSession();
+        User user = (User) session.getAttribute("user");
+
+        // The user must be logged in to book. The AuthenticationFilter handles this,
+        // but it's good practice to check for the user object anyway.
+        if (user == null) {
+            resp.sendRedirect(req.getContextPath() + "/login");
+            return;
+        }
+
         String turfIdStr = req.getParameter("turfId");
         String sportIdStr = req.getParameter("sportId");
-        String name = req.getParameter("name");
-        String email = req.getParameter("email");
-        String phone = req.getParameter("phone");
         String startStr = req.getParameter("startTime");
         String endStr = req.getParameter("endTime");
 
         try {
             long turfId = Long.parseLong(turfIdStr);
             long sportId = Long.parseLong(sportIdStr);
-            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
-            LocalDateTime start = LocalDateTime.parse(startStr, fmt);
-            LocalDateTime end = LocalDateTime.parse(endStr, fmt);
+            LocalDateTime start = LocalDateTime.parse(startStr);
+            LocalDateTime end = LocalDateTime.parse(endStr);
 
-            long bookingId = bookingService.createBooking(turfId, sportId, name, email, phone, start, end);
-            req.setAttribute("success", "Booking confirmed! ID: " + bookingId);
-        } catch (IllegalArgumentException ex) {
-            req.setAttribute("error", ex.getMessage());
-        } catch (SQLException ex) {
-            req.setAttribute("error", "Database error: " + ex.getMessage());
+            // CORRECTED: Call the new method with the logged-in user's ID
+            long bookingId = bookingService.createBooking(turfId, sportId, user.getId(), start, end);
+            req.setAttribute("success", "Booking confirmed! Your Booking ID is: " + bookingId);
         } catch (Exception ex) {
-            req.setAttribute("error", "Unexpected error: " + ex.getMessage());
+            req.setAttribute("error", ex.getMessage());
         }
 
-        // reload lists for the form
-        try {
-            req.setAttribute("turfs", turfDao.findAllActive());
-            req.setAttribute("sports", sportDao.findAllActive());
-        } catch (Exception ignored) {}
-
-        req.getRequestDispatcher("/WEB-INF/views/booking.jsp").forward(req, resp);
+        // After processing, reload the form data and forward
+        doGet(req, resp);
     }
 }
