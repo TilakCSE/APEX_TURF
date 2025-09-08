@@ -5,7 +5,7 @@
     </div>
     <nav class="admin-sidebar-nav">
         <a href="${pageContext.request.contextPath}/admin/dashboard" class="${pageTitle == 'Dashboard' ? 'active' : ''}">Dashboard</a>
-        <a href="#" class="${pageTitle == 'Turfs' ? 'active' : ''}">Manage Turfs</a>
+        <a href="${pageContext.request.contextPath}/admin/turfs" class="${pageTitle == 'Turfs' ? 'active' : ''}">Manage Turfs</a>
         <a href="#" class="${pageTitle == 'Sports' ? 'active' : ''}">Manage Sports</a>
     </nav>
     <div class="admin-sidebar-footer">

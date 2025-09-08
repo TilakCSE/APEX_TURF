@@ -13,3 +13,26 @@ body.admin { background-color: var(--admin-bg); color: var(--admin-text); font-f
 .admin-card { background: var(--admin-card); border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); padding: 20px; }
 .admin-login-wrapper { display: flex; align-items: center; justify-content: center; height: 100vh; background: var(--admin-bg); }
 .admin-login-card { width: 400px; }
+/* Admin Table Styles */
+.admin-table { width: 100%; border-collapse: collapse; }
+.admin-table th, .admin-table td { padding: 12px 15px; border-bottom: 1px solid var(--admin-border); text-align: left; }
+.admin-table th { background-color: #ecf0f1; }
+.admin-table tr:hover { background-color: #f8f9fa; }
+.status-active { color: #27ae60; font-weight: bold; }
+.status-inactive { color: #7f8c8d; }
+
+/* Admin Header */
+.admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.btn-primary, .btn-secondary, .btn-edit, .btn-delete { text-decoration: none; color: white; padding: 10px 15px; border-radius: 5px; border: none; cursor: pointer; }
+.btn-primary { background-color: var(--admin-primary); }
+.btn-secondary { background-color: #95a5a6; }
+.btn-edit { background-color: #f39c12; font-size: 12px; padding: 5px 10px; }
+.btn-delete { background-color: #e74c3c; font-size: 12px; padding: 5px 10px; }
+
+/* Admin Form Styles */
+.admin-form .form-group { margin-bottom: 20px; }
+.admin-form label { display: block; margin-bottom: 5px; font-weight: bold; }
+.admin-form input[type="text"] { width: 100%; padding: 10px; border: 1px solid var(--admin-border); border-radius: 4px; }
+.admin-form .form-actions { margin-top: 20px; }
+.checkbox-group { display: flex; flex-wrap: wrap; gap: 20px; border: 1px solid var(--admin-border); padding: 15px; border-radius: 4px; }
+.checkbox-label { font-weight: normal; display: flex; align-items: center; gap: 8px; }
