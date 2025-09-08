@@ -5,20 +5,15 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.example.dao.SportDao;
 import org.example.dao.TurfDao;
-import org.example.service.BookingService;
 import org.example.model.User;
-import jakarta.servlet.http.HttpSession;
+import org.example.service.BookingService;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
-/**
- * Handles GET for booking form and POST for booking creation
- */
 @WebServlet(name = "BookingServlet", urlPatterns = "/booking")
 public class BookingServlet extends HttpServlet {
 
@@ -29,9 +24,10 @@ public class BookingServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-            req.setAttribute("turfs", turfDao.findAllActive());
-            req.setAttribute("sports", sportDao.findAllActive());
-            req.setAttribute("currentPage", "booking"); // <-- ADD THIS LINE
+            // CORRECTED: Changed from findAllActive() to findAll()
+            req.setAttribute("turfs", turfDao.findAll());
+            req.setAttribute("sports", sportDao.findAllActive()); // SportDao still uses findAllActive
+            req.setAttribute("currentPage", "booking");
         } catch (Exception e) {
             req.setAttribute("error", "Failed to load data: " + e.getMessage());
         }
@@ -43,8 +39,6 @@ public class BookingServlet extends HttpServlet {
         HttpSession session = req.getSession();
         User user = (User) session.getAttribute("user");
 
-        // The user must be logged in to book. The AuthenticationFilter handles this,
-        // but it's good practice to check for the user object anyway.
         if (user == null) {
             resp.sendRedirect(req.getContextPath() + "/login");
             return;
@@ -61,14 +55,12 @@ public class BookingServlet extends HttpServlet {
             LocalDateTime start = LocalDateTime.parse(startStr);
             LocalDateTime end = LocalDateTime.parse(endStr);
 
-            // CORRECTED: Call the new method with the logged-in user's ID
             long bookingId = bookingService.createBooking(turfId, sportId, user.getId(), start, end);
             req.setAttribute("success", "Booking confirmed! Your Booking ID is: " + bookingId);
         } catch (Exception ex) {
             req.setAttribute("error", ex.getMessage());
         }
 
-        // After processing, reload the form data and forward
         doGet(req, resp);
     }
 }

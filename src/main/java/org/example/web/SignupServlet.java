@@ -26,11 +26,11 @@ public class SignupServlet extends HttpServlet {
         String phone = req.getParameter("phone");
         String password = req.getParameter("password");
 
-        User newUser = new User(null, name, email, phone, password);
+        // CORRECTED: The role "USER" is now included when creating a new User object.
+        User newUser = new User(null, name, email, phone, password, "USER");
 
         try {
             userService.register(newUser);
-            // Redirect to login page with a success message
             resp.sendRedirect(req.getContextPath() + "/login?success=true");
         } catch (IllegalArgumentException e) {
             req.setAttribute("error", e.getMessage());
