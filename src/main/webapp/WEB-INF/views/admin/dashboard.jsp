@@ -62,21 +62,26 @@
                         <td>${b.turfName}</td>
                         <td>${b.sportName}</td>
                         <td>${b.formattedStartTime}</td>
-                        <td><span class="status-${b.status.toLowerCase()}">${b.status}</span></td>
+                        <td>
+                            <span class="status-${b.status.toLowerCase().contains('cancelled') ? 'cancelled' : b.status.toLowerCase()}">
+                                    ${b.status.replace('_', ' ')}
+                            </span>
+                        </td>
                         <td class="action-buttons">
-                            <c:if test="${b.status != 'CONFIRMED'}">
+                            <%-- The "Confirm" button will now ONLY show if the status is CANCELLED_BY_ADMIN --%>
+                            <c:if test="${b.status == 'CANCELLED_BY_ADMIN'}">
                                 <form method="post" action="${pageContext.request.contextPath}/admin/dashboard">
                                     <input type="hidden" name="action" value="confirm">
                                     <input type="hidden" name="bookingId" value="${b.id}">
                                     <button type="submit" class="btn-confirm">Confirm</button>
                                 </form>
                             </c:if>
-                             <c:if test="${b.status != 'CANCELLED'}">
-                                <form method="post" action="${pageContext.request.contextPath}/admin/dashboard">
-                                    <input type="hidden" name="action" value="cancel">
-                                    <input type="hidden" name="bookingId" value="${b.id}">
-                                    <button type="submit" class="btn-delete">Cancel</button>
-                                </form>
+                            <c:if test="${not b.status.startsWith('CANCELLED')}">
+                                     <form method="post" action="${pageContext.request.contextPath}/admin/dashboard">
+                                         <input type="hidden" name="action" value="cancel">
+                                         <input type="hidden" name="bookingId" value="${b.id}">
+                                         <button type="submit" class="btn-delete">Cancel</button>
+                                     </form>
                             </c:if>
                         </td>
                     </tr>

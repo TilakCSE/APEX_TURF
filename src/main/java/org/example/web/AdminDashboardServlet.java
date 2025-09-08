@@ -52,8 +52,9 @@ public class AdminDashboardServlet extends HttpServlet {
 
         try {
             if ("cancel".equals(action)) {
-                bookingService.updateBookingStatusAsAdmin(bookingId, "CANCELLED");
-                req.getSession().setAttribute("successMessage", "Booking #" + bookingId + " has been cancelled.");
+                // CHANGED: Use a specific status
+                bookingService.updateBookingStatusAsAdmin(bookingId, "CANCELLED_BY_ADMIN");
+                req.getSession().setAttribute("successMessage", "Booking #" + bookingId + " has been cancelled by admin.");
             } else if ("confirm".equals(action)) {
                 bookingService.updateBookingStatusAsAdmin(bookingId, "CONFIRMED");
                 req.getSession().setAttribute("successMessage", "Booking #" + bookingId + " has been re-confirmed.");

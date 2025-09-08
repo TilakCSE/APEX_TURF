@@ -69,7 +69,8 @@ public class BookingService {
         if (LocalDateTime.now().isAfter(booking.getStartTime().minusHours(CANCELLATION_CUTOFF_HOURS))) {
             throw new IllegalStateException("Cancellation is only allowed up to " + CANCELLATION_CUTOFF_HOURS + " hours before booking time.");
         }
-        bookingDao.updateStatus(bookingId, userId, "CANCELLED");
+        // CHANGED: Use a specific status
+        bookingDao.updateStatus(bookingId, userId, "CANCELLED_BY_USER");
     }
 
     public List<Booking> getFilteredBookings(Long turfId, Long sportId, String date) throws SQLException {
@@ -77,7 +78,6 @@ public class BookingService {
     }
 
     public void updateBookingStatusAsAdmin(long bookingId, String status) throws SQLException {
-        // Admin action does not need ownership or time checks
         boolean updated = bookingDao.adminUpdateStatus(bookingId, status);
         if (!updated) {
             throw new SQLException("Failed to update booking status, booking not found.");
