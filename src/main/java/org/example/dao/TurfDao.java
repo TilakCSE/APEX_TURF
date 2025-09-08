@@ -160,4 +160,14 @@ public class TurfDao {
             ps.executeUpdate();
         }
     }
+
+    public void updateActiveStatus(long id, boolean active) throws SQLException {
+        String sql = "UPDATE turfs SET active = ? WHERE id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setBoolean(1, active);
+            ps.setLong(2, id);
+            ps.executeUpdate();
+        }
+    }
 }
