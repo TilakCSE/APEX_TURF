@@ -25,16 +25,19 @@
             <form method="post" action="${pageContext.request.contextPath}/booking" class="form-grid">
                 <label>
                     <span>Turf</span>
-                    <select name="turfId" required>
+                    <%-- The ID here is used by the JavaScript --%>
+                    <select name="turfId" id="turf-select" required>
                         <option value="" disabled selected>Select a turf</option>
                         <c:forEach items="${turfs}" var="t">
-                            <option value="${t.id}">${t.name} — ${t.location}</option>
+                            <%-- We add a data-sports attribute with the list of sport IDs --%>
+                            <option value="${t.id}" data-sports="${t.sportIds}">${t.name} — ${t.location}</option>
                         </c:forEach>
                     </select>
                 </label>
                 <label>
                     <span>Sport</span>
-                    <select name="sportId" required>
+                     <%-- The ID here is used by the JavaScript --%>
+                    <select name="sportId" id="sport-select" required>
                         <option value="" disabled selected>Select a sport</option>
                         <c:forEach items="${sports}" var="s">
                             <option value="${s.id}">${s.name}</option>
@@ -53,5 +56,46 @@
             </form>
         </section>
     </main>
+
+    <%-- ADD THIS SCRIPT BLOCK at the end of the body --%>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const turfSelect = document.getElementById('turf-select');
+            const sportSelect = document.getElementById('sport-select');
+            const sportOptions = Array.from(sportSelect.options);
+
+            turfSelect.addEventListener('change', function () {
+                // Get the list of allowed sport IDs from the selected turf's data-sports attribute
+                const selectedTurfOption = turfSelect.options[turfSelect.selectedIndex];
+                const allowedSports = selectedTurfOption.getAttribute('data-sports');
+
+                // Reset sport selection
+                sportSelect.value = '';
+
+                // Filter the sport options
+                sportOptions.forEach(option => {
+                    // Always show the placeholder "Select a sport"
+                    if (option.value === '') {
+                        option.style.display = 'block';
+                        return;
+                    }
+
+                    // Check if the sport's ID is in the list of allowed sports
+                    if (allowedSports && allowedSports.includes(option.value)) {
+                        option.style.display = 'block'; // Show the option
+                    } else {
+                        option.style.display = 'none'; // Hide the option
+                    }
+                });
+            });
+
+            // Initially, hide all sports except the placeholder until a turf is selected
+            sportOptions.forEach(option => {
+                if (option.value !== '') {
+                    option.style.display = 'none';
+                }
+            });
+        });
+    </script>
 </body>
 </html>
