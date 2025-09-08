@@ -71,4 +71,16 @@ public class BookingService {
         }
         bookingDao.updateStatus(bookingId, userId, "CANCELLED");
     }
+
+    public List<Booking> getFilteredBookings(Long turfId, Long sportId, String date) throws SQLException {
+        return bookingDao.findFilteredBookings(turfId, sportId, date);
+    }
+
+    public void updateBookingStatusAsAdmin(long bookingId, String status) throws SQLException {
+        // Admin action does not need ownership or time checks
+        boolean updated = bookingDao.adminUpdateStatus(bookingId, status);
+        if (!updated) {
+            throw new SQLException("Failed to update booking status, booking not found.");
+        }
+    }
 }
