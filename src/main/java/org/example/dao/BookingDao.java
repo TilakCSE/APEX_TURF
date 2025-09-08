@@ -142,4 +142,63 @@ public class BookingDao {
         }
         return bookings;
     }
+
+    public List<Booking> findFilteredBookings(Long turfId, Long sportId, String date) throws SQLException {
+        List<Booking> bookings = new ArrayList<>();
+        // Base query joins with all necessary tables
+        StringBuilder sql = new StringBuilder(
+                "SELECT b.*, u.name as user_name, t.name as turf_name, s.name as sport_name " +
+                        "FROM bookings b " +
+                        "JOIN users u ON b.user_id = u.id " +
+                        "JOIN turfs t ON b.turf_id = t.id " +
+                        "JOIN sports s ON b.sport_id = s.id " +
+                        "WHERE 1=1" // Start with a true condition to easily append AND clauses
+        );
+
+        List<Object> params = new ArrayList<>();
+
+        if (turfId != null && turfId > 0) {
+            sql.append(" AND b.turf_id = ?");
+            params.add(turfId);
+        }
+        if (sportId != null && sportId > 0) {
+            sql.append(" AND b.sport_id = ?");
+            params.add(sportId);
+        }
+        if (date != null && !date.isEmpty()) {
+            sql.append(" AND DATE(b.start_time) = ?");
+            params.add(date);
+        }
+        sql.append(" ORDER BY b.start_time DESC");
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+            // Set parameters dynamically
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Booking booking = mapRowToBooking(rs);
+                    booking.setUserName(rs.getString("user_name"));
+                    booking.setTurfName(rs.getString("turf_name"));
+                    booking.setSportName(rs.getString("sport_name"));
+                    bookings.add(booking);
+                }
+            }
+        }
+        return bookings;
+    }
+
+    public boolean adminUpdateStatus(long bookingId, String newStatus) throws SQLException {
+        String sql = "UPDATE bookings SET status = ? WHERE id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, newStatus);
+            ps.setLong(2, bookingId);
+            return ps.executeUpdate() > 0;
+        }
+    }
 }
