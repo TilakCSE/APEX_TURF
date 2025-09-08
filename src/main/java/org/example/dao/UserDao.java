@@ -13,7 +13,7 @@ public class UserDao {
     private final DataSource dataSource = DatabaseConfig.getDataSource();
 
     public User findByEmail(String email) throws SQLException {
-        String sql = "SELECT id, name, email, phone, password FROM users WHERE email = ?";
+        String sql = "SELECT id, name, email, phone, password, role FROM users WHERE email = ?";
         try (Connection conn = dataSource.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, email);
             try (ResultSet rs = ps.executeQuery()) {
@@ -23,7 +23,8 @@ public class UserDao {
                             rs.getString("name"),
                             rs.getString("email"),
                             rs.getString("phone"),
-                            rs.getString("password")
+                            rs.getString("password"),
+                            rs.getString("role")
                     );
                 }
             }
