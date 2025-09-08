@@ -13,9 +13,11 @@ public class Booking {
     private String status;
     private LocalDateTime createdAt;
 
+
     // New fields for easier display in JSP
     private String turfName;
     private String sportName;
+    private String userName;
     private transient boolean cancellable; // Not stored in DB
 
     // Constructors, standard getters/setters for old fields...
@@ -50,6 +52,7 @@ public class Booking {
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
+
     public String getFormattedStartTime() {
         if (startTime == null) return "";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy 'at' hh:mm a");
@@ -68,4 +71,6 @@ public class Booking {
     public void setSportName(String sportName) { this.sportName = sportName; }
     public boolean isCancellable() { return cancellable; }
     public void setCancellable(boolean cancellable) { this.cancellable = cancellable; }
+    public String getUserName() { return userName; }
+    public void setUserName(String userName) { this.userName = userName; }
 }
