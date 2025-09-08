@@ -1,5 +1,7 @@
 package org.example.model;
 
+import java.util.List;
+
 /**
  * Represents a turf facility where users can book time slots.
  */
@@ -8,6 +10,7 @@ public class Turf {
     private String name;
     private String location;
     private boolean active;
+    private List<Long> sportIds;
 
     public Turf() {}
 
@@ -35,6 +38,9 @@ public class Turf {
     public void setLocation(String location) { this.location = location; }
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
+
+    public List<Long> getSportIds() { return sportIds; }
+    public void setSportIds(List<Long> sportIds) { this.sportIds = sportIds; }
 
     @Override
     public String toString() {

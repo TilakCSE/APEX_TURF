@@ -27,7 +27,8 @@ public class TurfService {
     }
 
     public void deleteTurf(long id) throws SQLException {
-        turfDao.delete(id);
+        // We change the business logic here to deactivate instead of permanently deleting.
+        turfDao.updateActiveStatus(id, false);
     }
 
     public List<Long> getSportIdsForTurf(long turfId) throws SQLException {
