@@ -36,3 +36,10 @@ body.admin { background-color: var(--admin-bg); color: var(--admin-text); font-f
 .admin-form .form-actions { margin-top: 20px; }
 .checkbox-group { display: flex; flex-wrap: wrap; gap: 20px; border: 1px solid var(--admin-border); padding: 15px; border-radius: 4px; }
 .checkbox-label { font-weight: normal; display: flex; align-items: center; gap: 8px; }
+
+/* Add to admin-styles.css */
+.filter-form { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; }
+.filter-form select, .filter-form input { padding: 8px; border: 1px solid var(--admin-border); border-radius: 4px; }
+.export-link { text-align: right; margin-bottom: 15px; }
+.action-buttons { display: flex; gap: 5px; }
+.btn-confirm { background-color: #27ae60; color: white; padding: 5px 10px; border-radius: 5px; border: none; cursor: pointer; font-size: 12px;}
