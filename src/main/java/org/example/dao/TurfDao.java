@@ -73,12 +73,15 @@ public class TurfDao {
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                list.add(new Turf(
+                Turf turf = new Turf(
                         rs.getLong("id"),
                         rs.getString("name"),
                         rs.getString("location"),
                         rs.getBoolean("active")
-                ));
+                );
+                // NEW: Fetch and set the associated sport IDs for this turf
+                turf.setSportIds(findSportIdsForTurf(turf.getId()));
+                list.add(turf);
             }
         }
         return list;
