@@ -1,0 +1,12 @@
+# Gmail SMTP Server Configuration
+mail.smtp.host=smtp.gmail.com
+mail.smtp.port=587
+mail.smtp.auth=true
+mail.smtp.starttls.enable=true
+
+# Sender Credentials
+sender.email=your-email@gmail.com
+sender.password=YOUR_16_CHARACTER_APP_PASSWORD_HERE
+
+# Admin Notification Email
+admin.email=your-admin-email@example.com
