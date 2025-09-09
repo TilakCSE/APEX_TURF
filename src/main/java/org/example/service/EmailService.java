@@ -37,19 +37,9 @@ public class EmailService {
 
     public void sendBookingConfirmation(User user, Booking booking) {
         String subject = "APEX TURF Booking Confirmation (ID: " + booking.getId() + ")";
-        String template = loadTemplate("booking-confirmation.html");
-
-        String body = template
-                .replace("{{userName}}", user.getName())
-                .replace("{{bookingId}}", booking.getId().toString())
-                .replace("{{turfName}}", booking.getTurfName())
-                .replace("{{sportName}}", booking.getSportName())
-                .replace("{{startTime}}", booking.getFormattedStartTime())
-                .replace("{{endTime}}", booking.getFormattedEndTime());
-
-        // Send to user
+        String body = loadTemplateAndReplace(
+                "booking-confirmation.html", user, booking);
         send(user.getEmail(), subject, body);
-        // Send notification to admin
         send(adminEmail, "[Admin] New Booking: " + booking.getId(), "A new booking was made by " + user.getName() + " for " + booking.getTurfName() + " at " + booking.getFormattedStartTime());
     }
 
@@ -68,6 +58,14 @@ public class EmailService {
         send(user.getEmail(), subject, body);
         // Send notification to admin
         send(adminEmail, "[Admin] Booking Cancelled: " + booking.getId(), "Booking " + booking.getId() + " was cancelled by " + cancelledBy);
+    }
+
+    public void sendUserCancellationConfirmation(User user, Booking booking) {
+        String subject = "APEX TURF Booking Cancellation (ID: " + booking.getId() + ")";
+        String body = loadTemplateAndReplace(
+                "booking-cancellation.html", user, booking);
+        send(user.getEmail(), subject, body);
+        send(adminEmail, "[Admin] Booking Cancelled by User: " + booking.getId(), "Booking " + booking.getId() + " was cancelled by the user.");
     }
 
     private void send(String to, String subject, String htmlBody) {
@@ -91,6 +89,33 @@ public class EmailService {
             e.printStackTrace();
             // In a real app, you would log this error more robustly
         }
+    }
+
+    public void sendAdminCancellationNotice(User user, Booking booking) {
+        String subject = "APEX TURF Booking Update (ID: " + booking.getId() + ")";
+        String body = loadTemplateAndReplace(
+                "admin-cancellation.html", user, booking);
+        send(user.getEmail(), subject, body);
+    }
+
+    // NEW METHOD for reconfirmations
+    public void sendReconfirmationNotice(User user, Booking booking) {
+        String subject = "APEX TURF Booking Re-Confirmed (ID: " + booking.getId() + ")";
+        String body = loadTemplateAndReplace(
+                "booking-reconfirmation.html", user, booking);
+        send(user.getEmail(), subject, body);
+        send(adminEmail, "[Admin] Booking Re-Confirmed: " + booking.getId(), "Booking " + booking.getId() + " was re-confirmed by an admin.");
+    }
+
+    private String loadTemplateAndReplace(String templateName, User user, Booking booking) {
+        String template = loadTemplate(templateName);
+        return template
+                .replace("{{userName}}", user.getName())
+                .replace("{{bookingId}}", booking.getId().toString())
+                .replace("{{turfName}}", booking.getTurfName())
+                .replace("{{sportName}}", booking.getSportName())
+                .replace("{{startTime}}", booking.getFormattedStartTime())
+                .replace("{{endTime}}", booking.getFormattedEndTime());
     }
 
     private String loadTemplate(String fileName) {

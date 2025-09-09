@@ -83,11 +83,10 @@ public class BookingService {
     }
 
     public void cancelBooking(long bookingId, long userId) throws SQLException, SecurityException, IllegalStateException {
-        // ... existing logic to find and validate booking ...
         Booking booking = bookingDao.findById(bookingId);
         if (booking == null) throw new IllegalArgumentException("Booking not found.");
         if (booking.getUserId() != userId) throw new SecurityException("You are not authorized to cancel this booking.");
-        //... more validation ...
+        // ... other validation logic ...
 
         bookingDao.updateStatus(bookingId, userId, "CANCELLED_BY_USER");
 
@@ -95,7 +94,8 @@ public class BookingService {
         try {
             User user = userDao.findById(userId);
             if (user != null) {
-                emailService.sendCancellationConfirmation(user, booking, "User");
+                // UPDATED: Calls the specific method for user cancellations
+                emailService.sendUserCancellationConfirmation(user, booking);
             }
         } catch(Exception e) {
             System.err.println("Booking cancelled, but failed to send cancellation email. Booking ID: " + bookingId);
@@ -107,19 +107,31 @@ public class BookingService {
         return bookingDao.findFilteredBookings(turfId, sportId, date);
     }
 
-    public void updateBookingStatusAsAdmin(long bookingId, String status) throws SQLException {
-        bookingDao.adminUpdateStatus(bookingId, status);
+    public void updateBookingStatusAsAdmin(long bookingId, String newStatus) throws SQLException {
+        Booking booking = bookingDao.findById(bookingId);
+        if (booking == null) {
+            throw new SQLException("Booking not found with ID: " + bookingId);
+        }
+
+        User user = userDao.findById(booking.getUserId());
+        if (user == null) {
+            throw new SQLException("User not found for booking ID: " + bookingId);
+        }
+
+        // Update status in DB
+        bookingDao.adminUpdateStatus(bookingId, newStatus);
+        booking.setStatus(newStatus); // Update the object for the email
 
         // --- EMAIL LOGIC ---
         try {
-            Booking booking = bookingDao.findById(bookingId);
-            User user = userDao.findById(booking.getUserId());
-            if (user != null && "CANCELLED_BY_ADMIN".equals(status)) {
-                emailService.sendCancellationConfirmation(user, booking, "Admin");
+            if ("CANCELLED_BY_ADMIN".equals(newStatus)) {
+                emailService.sendAdminCancellationNotice(user, booking);
+            } else if ("CONFIRMED".equals(newStatus)) {
+                // We assume a change to CONFIRMED by an admin is a reconfirmation
+                emailService.sendReconfirmationNotice(user, booking);
             }
-            // Add more notifications here if needed (e.g., for re-confirmation)
         } catch (Exception e) {
-            System.err.println("Admin updated booking status, but failed to send notification email. Booking ID: " + bookingId);
+            System.err.println("Admin updated status, but email failed. Booking ID: " + bookingId);
             e.printStackTrace();
         }
     }
