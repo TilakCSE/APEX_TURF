@@ -8,20 +8,24 @@
     <nav class="nav-links">
         <c:choose>
             <c:when test="${not empty sessionScope.user}">
-                <%-- User is logged IN --%>
+                <%-- User is Logged IN --%>
                 <span class="nav-welcome">Welcome, ${sessionScope.user.name}</span>
 
-                <%-- ADDED THIS LINK --%>
                 <a href="${pageContext.request.contextPath}/booking"
                    class="nav-link ${currentPage == 'booking' ? 'active' : ''}">Book a Slot</a>
 
                 <a href="${pageContext.request.contextPath}/my-bookings"
                    class="nav-link ${currentPage == 'my-bookings' ? 'active' : ''}">My Bookings</a>
 
+                <%-- THIS IS THE NEW ADMIN-ONLY LOGIC --%>
+                <c:if test="${sessionScope.user.role == 'ADMIN'}">
+                    <a href="${pageContext.request.contextPath}/admin/dashboard" class="nav-link nav-link-admin">Admin Panel</a>
+                </c:if>
+
                 <a href="${pageContext.request.contextPath}/logout" class="nav-link">Logout</a>
             </c:when>
             <c:otherwise>
-                <%-- User is logged OUT --%>
+                <%-- User is Logged OUT --%>
                 <a href="${pageContext.request.contextPath}/login" class="nav-link">Login</a>
                 <a href="${pageContext.request.contextPath}/signup" class="nav-link">Sign Up</a>
             </c:otherwise>
