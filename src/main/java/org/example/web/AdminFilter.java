@@ -18,8 +18,9 @@ public class AdminFilter implements Filter {
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         HttpSession session = httpRequest.getSession(false);
 
-        // Allow access to the login page itself without being logged in
-        if (httpRequest.getRequestURI().endsWith("/admin/login")) {
+        // Allow access to the admin login page itself
+        String loginURI = httpRequest.getContextPath() + "/admin/login";
+        if (httpRequest.getRequestURI().equals(loginURI)) {
             chain.doFilter(request, response);
             return;
         }
@@ -33,9 +34,10 @@ public class AdminFilter implements Filter {
         }
 
         if (isAdmin) {
+            // User is an admin, allow access to the requested admin page
             chain.doFilter(request, response);
         } else {
-            // User is not an admin, redirect to the user login page
+            // User is not an admin, redirect them to the regular user login page
             httpResponse.sendRedirect(httpRequest.getContextPath() + "/login?error=admin_required");
         }
     }

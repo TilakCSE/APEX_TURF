@@ -227,3 +227,15 @@ select {
         grid-template-columns: 1fr;
     }
 }
+
+.nav-link-admin {
+    background-color: #f59e0b; /* A prominent amber color */
+    color: white !important; /* Overrides other color rules */
+    border-color: transparent !important;
+}
+
+.nav-link-admin:hover {
+    background-color: #d97706; /* A darker shade for hover */
+    color: white !important;
+    border-color: transparent !important;
+}
