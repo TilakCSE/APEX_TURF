@@ -41,7 +41,7 @@ public class BookingService {
             throw new IllegalArgumentException("Selected time slot is not available.");
         }
 
-        Booking booking = new Booking(null, userId, turfId, sportId, start, end, "CONFIR-MED", LocalDateTime.now());
+        Booking booking = new Booking(null, userId, turfId, sportId, start, end, "CONFIRMED", LocalDateTime.now());
         long bookingId = bookingDao.create(booking);
 
         // --- EMAIL LOGIC (now simpler) ---
