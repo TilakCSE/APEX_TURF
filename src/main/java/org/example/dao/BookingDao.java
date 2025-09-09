@@ -57,13 +57,25 @@ public class BookingDao {
     }
 
     public Booking findById(long bookingId) throws SQLException {
-        String sql = "SELECT * FROM bookings WHERE id = ?";
+        // UPDATED: This query now joins with users, turfs, and sports to get all names.
+        String sql = "SELECT b.*, u.name as user_name, t.name as turf_name, s.name as sport_name " +
+                "FROM bookings b " +
+                "JOIN users u ON b.user_id = u.id " +
+                "JOIN turfs t ON b.turf_id = t.id " +
+                "JOIN sports s ON b.sport_id = s.id " +
+                "WHERE b.id = ?";
+
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, bookingId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return mapRowToBooking(rs);
+                    Booking booking = mapRowToBooking(rs);
+                    // Now we populate the extra fields needed for the email
+                    booking.setUserName(rs.getString("user_name"));
+                    booking.setTurfName(rs.getString("turf_name"));
+                    booking.setSportName(rs.getString("sport_name"));
+                    return booking;
                 }
             }
         }

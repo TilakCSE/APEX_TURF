@@ -88,6 +88,7 @@ public class EmailService {
             System.out.println("Email sent successfully to " + to);
         } catch (MessagingException e) {
             System.err.println("Failed to send email. Error: " + e.getMessage());
+            e.printStackTrace();
             // In a real app, you would log this error more robustly
         }
     }

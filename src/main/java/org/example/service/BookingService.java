@@ -55,6 +55,7 @@ public class BookingService {
             }
         } catch (Exception e) {
             System.err.println("Booking created, but failed to send confirmation email. Booking ID: " + bookingId);
+            e.printStackTrace();
             // Don't re-throw the exception, as the booking itself was successful.
         }
 
@@ -97,6 +98,7 @@ public class BookingService {
             }
         } catch(Exception e) {
             System.err.println("Booking cancelled, but failed to send cancellation email. Booking ID: " + bookingId);
+            e.printStackTrace();
         }
     }
 
@@ -117,6 +119,7 @@ public class BookingService {
             // Add more notifications here if needed (e.g., for re-confirmation)
         } catch (Exception e) {
             System.err.println("Admin updated booking status, but failed to send notification email. Booking ID: " + bookingId);
+            e.printStackTrace();
         }
     }
 }
