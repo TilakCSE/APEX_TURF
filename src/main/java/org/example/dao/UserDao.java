@@ -47,5 +47,26 @@ public class UserDao {
         }
         throw new SQLException("Failed to insert user, no ID returned");
     }
+
+    public User findById(long id) throws SQLException {
+        String sql = "SELECT id, name, email, phone, password, role FROM users WHERE id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new User(
+                            rs.getLong("id"),
+                            rs.getString("name"),
+                            rs.getString("email"),
+                            rs.getString("phone"),
+                            rs.getString("password"),
+                            rs.getString("role")
+                    );
+                }
+            }
+        }
+        return null;
+    }
 }
 
