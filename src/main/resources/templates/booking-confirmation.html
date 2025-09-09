@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
+        .header { background-color: #4f46e5; color: white; padding: 10px; text-align: center; border-radius: 5px 5px 0 0; }
+        .content { padding: 20px; }
+        .footer { font-size: 0.8em; text-align: center; color: #777; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header"><h1>Booking Confirmed!</h1></div>
+    <div class="content">
+        <p>Hi {{userName}},</p>
+        <p>Your booking at APEX TURF has been successfully confirmed. We look forward to seeing you!</p>
+        <h3>Booking Details:</h3>
+        <ul>
+            <li><strong>Booking ID:</strong> {{bookingId}}</li>
+            <li><strong>Turf:</strong> {{turfName}}</li>
+            <li><strong>Sport:</strong> {{sportName}}</li>
+            <li><strong>Start Time:</strong> {{startTime}}</li>
+            <li><strong>End Time:</strong> {{endTime}}</li>
+        </ul>
+        <p>Thank you for choosing APEX TURF!</p>
+    </div>
+    <div class="footer"><p>&copy; APEX TURF. All rights reserved.</p></div>
+</div>
+</body>
+</html>
