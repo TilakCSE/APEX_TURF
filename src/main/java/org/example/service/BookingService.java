@@ -35,28 +35,29 @@ public class BookingService {
      * - No overlap with existing confirmed bookings on same turf+sport
      */
     public long createBooking(long turfId, long sportId, long userId, LocalDateTime start, LocalDateTime end) throws SQLException {
-        // ... validation logic is the same ...
         validateTimes(start, end);
         boolean available = bookingDao.isSlotAvailable(turfId, sportId, Timestamp.valueOf(start), Timestamp.valueOf(end));
         if (!available) {
             throw new IllegalArgumentException("Selected time slot is not available.");
         }
 
-        Booking booking = new Booking(null, userId, turfId, sportId, start, end, "CONFIRMED", LocalDateTime.now());
+        Booking booking = new Booking(null, userId, turfId, sportId, start, end, "CONFIR-MED", LocalDateTime.now());
         long bookingId = bookingDao.create(booking);
-        booking.setId(bookingId); // Set the generated ID on the object
 
-        // --- EMAIL LOGIC ---
+        // --- EMAIL LOGIC (now simpler) ---
         try {
-            User user = userDao.findById(userId); // Fetch user details for the email
-            Booking detailedBooking = bookingDao.findById(bookingId); // Fetch booking with turf/sport names
-            if (user != null && detailedBooking != null) {
+            // We no longer need to fetch the User separately
+            Booking detailedBooking = bookingDao.findById(bookingId);
+            if (detailedBooking != null) {
+                // Create a temporary user object with the details we need for the email
+                User user = new User();
+                user.setName(detailedBooking.getUserName());
+                user.setEmail(userDao.findById(userId).getEmail()); // We still need email
                 emailService.sendBookingConfirmation(user, detailedBooking);
             }
         } catch (Exception e) {
             System.err.println("Booking created, but failed to send confirmation email. Booking ID: " + bookingId);
             e.printStackTrace();
-            // Don't re-throw the exception, as the booking itself was successful.
         }
 
         return bookingId;
