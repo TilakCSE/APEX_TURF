@@ -86,3 +86,5 @@ body.admin { background-color: var(--admin-bg); color: var(--admin-text); font-f
         grid-template-columns: 1fr;
     }
 }
+
+.review-stars { color: #f39c12; font-weight: bold; }

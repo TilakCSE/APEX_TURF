@@ -31,4 +31,8 @@ public class ReviewService {
     public void deleteReview(long reviewId) throws SQLException {
         reviewDao.delete(reviewId);
     }
+
+    public List<Review> getAllReviews() throws SQLException {
+        return reviewDao.findAll();
+    }
 }
