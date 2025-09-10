@@ -51,8 +51,11 @@
                                                 <button type="submit" class="btn-cancel">Cancel</button>
                                             </form>
                                         </c:when>
+                                        <c:when test="${b.reviewable}">
+                                                    <a href="${pageContext.request.contextPath}/review?bookingId=${b.id}" class="btn-review">Leave a Review</a>
+                                        </c:when>
                                         <c:otherwise>
-                                            <span class="action-muted">—</span>
+                                                    <span class="action-muted">—</span>
                                         </c:otherwise>
                                     </c:choose>
                                 </td>

@@ -12,6 +12,7 @@ public class Booking {
     private LocalDateTime endTime;
     private String status;
     private LocalDateTime createdAt;
+    private transient boolean isReviewable;
 
 
     // New fields for easier display in JSP
@@ -73,4 +74,7 @@ public class Booking {
     public void setCancellable(boolean cancellable) { this.cancellable = cancellable; }
     public String getUserName() { return userName; }
     public void setUserName(String userName) { this.userName = userName; }
+
+    public boolean isReviewable() { return isReviewable; }
+    public void setReviewable(boolean reviewable) { this.isReviewable = reviewable; }
 }

@@ -4,6 +4,7 @@ import org.example.dao.BookingDao;
 import org.example.dao.UserDao;
 import org.example.model.Booking;
 import org.example.model.User;
+import org.example.dao.ReviewDao;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -19,11 +20,13 @@ public class BookingService {
     private final UserDao userDao;
     private final EmailService emailService;
     private static final int CANCELLATION_CUTOFF_HOURS = 12;
+    private final ReviewDao reviewDao;
 
     public BookingService() {
         this.bookingDao = new BookingDao();
         this.userDao = new UserDao();
         this.emailService = new EmailService();
+        this.reviewDao = new ReviewDao();
     }
 
     /**
@@ -75,9 +78,16 @@ public class BookingService {
     public List<Booking> getBookingsForUser(long userId) throws SQLException {
         List<Booking> bookings = bookingDao.findBookingsByUserId(userId);
         for (Booking booking : bookings) {
+            // Logic for cancellable
             boolean isCancellable = "CONFIRMED".equals(booking.getStatus()) &&
                     LocalDateTime.now().isBefore(booking.getStartTime().minusHours(CANCELLATION_CUTOFF_HOURS));
             booking.setCancellable(isCancellable);
+
+            // NEW: Logic for reviewable
+            boolean isReviewable = "CONFIRMED".equals(booking.getStatus()) &&
+                    booking.getEndTime().isBefore(LocalDateTime.now()) &&
+                    !reviewDao.hasUserReviewedBooking(booking.getId());
+            booking.setReviewable(isReviewable);
         }
         return bookings;
     }
