@@ -239,3 +239,13 @@ select {
     color: white !important;
     border-color: transparent !important;
 }
+
+.btn-review {
+    background-color: #f59e0b;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+}
