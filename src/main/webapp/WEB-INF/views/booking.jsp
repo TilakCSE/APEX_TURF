@@ -15,28 +15,27 @@
             <h1>Book your turf</h1>
             <p class="subtitle">Select turf, sport, and a convenient time slot.</p>
 
-            <c:if test="${not empty success}">
-                <div class="alert success">${success}</div>
-            </c:if>
-            <c:if test="${not empty error}">
-                <div class="alert error">${error}</div>
-            </c:if>
+            <c:if test="${not empty success}"><div class="alert success">${success}</div></c:if>
+            <c:if test="${not empty error}"><div class="alert error">${error}</div></c:if>
 
             <form method="post" action="${pageContext.request.contextPath}/booking" class="form-grid">
-                <label>
-                    <span>Turf</span>
-                    <%-- The ID here is used by the JavaScript --%>
-                    <select name="turfId" id="turf-select" required>
-                        <option value="" disabled selected>Select a turf</option>
-                        <c:forEach items="${turfs}" var="t">
-                            <%-- We add a data-sports attribute with the list of sport IDs --%>
-                            <option value="${t.id}" data-sports="${t.sportIds}">${t.name} — ${t.location}</option>
-                        </c:forEach>
-                    </select>
-                </label>
+
+                <%-- UPDATED: Turf selection is now wrapped in a div with the button --%>
+                <div class="turf-selection-group" style="grid-column: 1 / -1;">
+                    <label>
+                        <span>Turf</span>
+                        <select name="turfId" id="turf-select" required>
+                            <option value="" disabled selected>Select a turf to see details</option>
+                            <c:forEach items="${turfs}" var="t">
+                                <option value="${t.id}" data-sports="${t.sportIds}">${t.name} — ${t.location}</option>
+                            </c:forEach>
+                        </select>
+                    </label>
+                    <a href="#" id="view-details-btn" class="btn-secondary disabled" target="_blank">View Details</a>
+                </div>
+
                 <label>
                     <span>Sport</span>
-                     <%-- The ID here is used by the JavaScript --%>
                     <select name="sportId" id="sport-select" required>
                         <option value="" disabled selected>Select a sport</option>
                         <c:forEach items="${sports}" var="s">
@@ -44,6 +43,8 @@
                         </c:forEach>
                     </select>
                 </label>
+
+                <%-- The rest of the form is unchanged --%>
                 <label>
                     <span>Start time</span>
                     <input type="datetime-local" name="startTime" required/>
@@ -57,43 +58,45 @@
         </section>
     </main>
 
-    <%-- ADD THIS SCRIPT BLOCK at the end of the body --%>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const turfSelect = document.getElementById('turf-select');
             const sportSelect = document.getElementById('sport-select');
             const sportOptions = Array.from(sportSelect.options);
+            const detailsButton = document.getElementById('view-details-btn'); // Get the button
 
             turfSelect.addEventListener('change', function () {
-                // Get the list of allowed sport IDs from the selected turf's data-sports attribute
                 const selectedTurfOption = turfSelect.options[turfSelect.selectedIndex];
                 const allowedSports = selectedTurfOption.getAttribute('data-sports');
+                const selectedTurfId = this.value;
 
-                // Reset sport selection
+                // --- Logic for the "View Details" button ---
+                if (selectedTurfId) {
+                    detailsButton.href = `turf-details?turfId=${selectedTurfId}`;
+                    detailsButton.classList.remove('disabled');
+                } else {
+                    detailsButton.href = '#';
+                    detailsButton.classList.add('disabled');
+                }
+
+                // --- Logic for filtering sports (unchanged) ---
                 sportSelect.value = '';
-
-                // Filter the sport options
                 sportOptions.forEach(option => {
-                    // Always show the placeholder "Select a sport"
                     if (option.value === '') {
                         option.style.display = 'block';
                         return;
                     }
-
-                    // Check if the sport's ID is in the list of allowed sports
                     if (allowedSports && allowedSports.includes(option.value)) {
-                        option.style.display = 'block'; // Show the option
+                        option.style.display = 'block';
                     } else {
-                        option.style.display = 'none'; // Hide the option
+                        option.style.display = 'none';
                     }
                 });
             });
 
-            // Initially, hide all sports except the placeholder until a turf is selected
+            // Initially, hide all sports except the placeholder
             sportOptions.forEach(option => {
-                if (option.value !== '') {
-                    option.style.display = 'none';
-                }
+                if (option.value !== '') option.style.display = 'none';
             });
         });
     </script>

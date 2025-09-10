@@ -11,8 +11,10 @@ public class Review {
     private String comment;
     private LocalDateTime createdAt;
 
+
     // Extra field for display purposes
     private String userName;
+    private String turfName;
 
     public Review() {}
 
@@ -33,4 +35,6 @@ public class Review {
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public String getUserName() { return userName; }
     public void setUserName(String userName) { this.userName = userName; }
+    public String getTurfName() { return turfName; }
+    public void setTurfName(String turfName) { this.turfName = turfName; }
 }

@@ -74,6 +74,24 @@ public class ReviewDao {
         }
     }
 
+    public List<Review> findAll() throws SQLException {
+        List<Review> reviews = new ArrayList<>();
+        String sql = "SELECT r.*, u.name as user_name, t.name as turf_name FROM reviews r " +
+                "JOIN users u ON r.user_id = u.id " +
+                "JOIN turfs t ON r.turf_id = t.id " +
+                "ORDER BY r.created_at DESC";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Review review = mapRowToReview(rs); // Your existing mapRowToReview should work
+                review.setTurfName(rs.getString("turf_name")); // Set the new field
+                reviews.add(review);
+            }
+        }
+        return reviews;
+    }
+
     private Review mapRowToReview(ResultSet rs) throws SQLException {
         Review review = new Review();
         review.setId(rs.getLong("id"));
@@ -83,9 +101,22 @@ public class ReviewDao {
         review.setRating(rs.getInt("rating"));
         review.setComment(rs.getString("comment"));
         review.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-        if (rs.getMetaData().getColumnCount() > 7) { // Check if user_name is present from JOIN
+
+        // Check if the joined column exists before trying to access it
+        if (columnExists(rs, "user_name")) {
             review.setUserName(rs.getString("user_name"));
         }
         return review;
+    }
+
+    private boolean columnExists(ResultSet rs, String columnName) throws SQLException {
+        ResultSetMetaData metaData = rs.getMetaData();
+        int columns = metaData.getColumnCount();
+        for (int x = 1; x <= columns; x++) {
+            if (columnName.equals(metaData.getColumnName(x))) {
+                return true;
+            }
+        }
+        return false;
     }
 }
