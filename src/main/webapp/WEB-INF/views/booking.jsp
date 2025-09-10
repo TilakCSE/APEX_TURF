@@ -31,6 +31,7 @@
                             </c:forEach>
                         </select>
                     </label>
+                    <%-- Ensure the class="btn-secondary disabled" is on the <a> tag --%>
                     <a href="#" id="view-details-btn" class="btn-secondary disabled" target="_blank">View Details</a>
                 </div>
 

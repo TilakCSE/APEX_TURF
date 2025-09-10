@@ -1,9 +1,7 @@
 package org.example.dao;
 
 import org.example.config.DatabaseConfig;
-import org.example.model.Sport;
 import org.example.model.Turf;
-
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
@@ -79,7 +77,8 @@ public class TurfDao {
                         rs.getString("location"),
                         rs.getBoolean("active")
                 );
-                // NEW: Fetch and set the associated sport IDs for this turf
+                // NEW: We now fetch and attach the sport IDs for each turf.
+                // This provides the data needed by booking.jsp.
                 turf.setSportIds(findSportIdsForTurf(turf.getId()));
                 list.add(turf);
             }
