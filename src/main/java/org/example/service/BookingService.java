@@ -145,4 +145,8 @@ public class BookingService {
             e.printStackTrace();
         }
     }
+
+    public List<Booking> getBookingsForCalendar(long turfId, LocalDateTime start, LocalDateTime end) throws SQLException {
+        return bookingDao.findBookingsByTurfAndDateRange(turfId, start, end);
+    }
 }
