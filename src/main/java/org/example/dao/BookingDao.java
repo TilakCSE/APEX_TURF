@@ -3,6 +3,7 @@ package org.example.dao;
 import org.example.config.DatabaseConfig;
 import org.example.model.Booking;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -212,5 +213,23 @@ public class BookingDao {
             ps.setLong(2, bookingId);
             return ps.executeUpdate() > 0;
         }
+    }
+
+    public List<Booking> findBookingsByTurfAndDateRange(long turfId, LocalDateTime start, LocalDateTime end) throws SQLException {
+        List<Booking> bookings = new ArrayList<>();
+        // This query finds all bookings that overlap with the given time window
+        String sql = "SELECT * FROM bookings WHERE turf_id = ? AND status = 'CONFIRMED' AND start_time < ? AND end_time > ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, turfId);
+            ps.setTimestamp(2, Timestamp.valueOf(end));
+            ps.setTimestamp(3, Timestamp.valueOf(start));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    bookings.add(mapRowToBooking(rs));
+                }
+            }
+        }
+        return bookings;
     }
 }
