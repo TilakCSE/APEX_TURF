@@ -32,6 +32,7 @@
                             </span>
                         </td>
                         <td>
+                            <a href="${pageContext.request.contextPath}/turf-details?turfId=${turf.id}" class="btn-view" target="_blank">View</a>
                             <a href="${pageContext.request.contextPath}/admin/turfs?action=edit&id=${turf.id}" class="btn-edit">Edit</a>
                             <a href="${pageContext.request.contextPath}/admin/turfs?action=delete&id=${turf.id}" class="btn-delete" onclick="return confirm('Are you sure?')">Delete</a>
                         </td>

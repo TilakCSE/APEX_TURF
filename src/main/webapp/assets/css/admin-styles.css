@@ -88,3 +88,24 @@ body.admin { background-color: var(--admin-bg); color: var(--admin-text); font-f
 }
 
 .review-stars { color: #f39c12; font-weight: bold; }
+
+/* Add these new styles */
+.btn-view {
+    background-color: #3498db; /* A distinct blue color */
+    font-size: 12px;
+    padding: 5px 10px;
+    text-decoration: none;
+    color: white;
+    border-radius: 5px;
+}
+
+.view-public-link {
+    margin-bottom: 15px;
+    text-align: right;
+}
+
+.view-public-link a {
+    text-decoration: none;
+    color: var(--admin-primary);
+    font-weight: 500;
+}

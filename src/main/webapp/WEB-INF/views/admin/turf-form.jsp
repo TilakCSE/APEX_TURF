@@ -6,6 +6,12 @@
 <main class="admin-main">
     <h1><c:out value="${turf.id == null ? 'Add New' : 'Edit'}"/> Turf</h1>
 
+    <c:if test="${turf.id != null}">
+            <div class="view-public-link">
+                <a href="${pageContext.request.contextPath}/turf-details?turfId=${turf.id}" target="_blank">View Public Page ↗</a>
+            </div>
+    </c:if>
+
     <div class="admin-card">
         <form method="post" action="${pageContext.request.contextPath}/admin/turfs" class="admin-form">
             <c:if test="${turf.id != null}">
