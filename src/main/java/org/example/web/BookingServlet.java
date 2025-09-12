@@ -36,31 +36,31 @@ public class BookingServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        HttpSession session = req.getSession();
-        User user = (User) session.getAttribute("user");
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+
+        HttpSession session = req.getSession(false);
+        User user = (session != null) ? (User) session.getAttribute("user") : null;
 
         if (user == null) {
-            resp.sendRedirect(req.getContextPath() + "/login");
+            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            resp.getWriter().write("{\"success\": false, \"message\": \"You must be logged in to book.\"}");
             return;
         }
 
-        String turfIdStr = req.getParameter("turfId");
-        String sportIdStr = req.getParameter("sportId");
-        String startStr = req.getParameter("startTime");
-        String endStr = req.getParameter("endTime");
-
         try {
-            long turfId = Long.parseLong(turfIdStr);
-            long sportId = Long.parseLong(sportIdStr);
-            LocalDateTime start = LocalDateTime.parse(startStr);
-            LocalDateTime end = LocalDateTime.parse(endStr);
+            long turfId = Long.parseLong(req.getParameter("turfId"));
+            long sportId = Long.parseLong(req.getParameter("sportId"));
+            LocalDateTime start = LocalDateTime.parse(req.getParameter("startTime"));
+            LocalDateTime end = LocalDateTime.parse(req.getParameter("endTime"));
 
-            long bookingId = bookingService.createBooking(turfId, sportId, user.getId(), start, end);
-            req.setAttribute("success", "Booking confirmed! Your Booking ID is: " + bookingId);
+            bookingService.createBooking(turfId, sportId, user.getId(), start, end);
+
+            resp.getWriter().write("{\"success\": true, \"message\": \"Booking confirmed!\"}");
+
         } catch (Exception ex) {
-            req.setAttribute("error", ex.getMessage());
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write("{\"success\": false, \"message\": \"" + ex.getMessage() + "\"}");
         }
-
-        doGet(req, resp);
     }
 }
