@@ -8,11 +8,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.example.dao.SportDao;
 import org.example.dao.TurfDao;
+import org.example.model.Turf;
 import org.example.model.User;
 import org.example.service.BookingService;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @WebServlet(name = "BookingServlet", urlPatterns = "/booking")
 public class BookingServlet extends HttpServlet {
@@ -24,12 +26,18 @@ public class BookingServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-            // CORRECTED: Changed from findAllActive() to findAll()
-            req.setAttribute("turfs", turfDao.findAll());
-            req.setAttribute("sports", sportDao.findAllActive()); // SportDao still uses findAllActive
+            List<Turf> turfs = turfDao.findAll();
+            req.setAttribute("turfs", turfs);
+            req.setAttribute("sports", sportDao.findAllActive());
             req.setAttribute("currentPage", "booking");
+
+            // Pass the ID of the first turf in the list so the calendar can load its data initially
+            if (turfs != null && !turfs.isEmpty()) {
+                req.setAttribute("initialTurfId", turfs.get(0).getId());
+            }
+
         } catch (Exception e) {
-            req.setAttribute("error", "Failed to load data: " + e.getMessage());
+            req.setAttribute("error", "Failed to load booking data: " + e.getMessage());
         }
         req.getRequestDispatcher("/WEB-INF/views/booking.jsp").forward(req, resp);
     }
