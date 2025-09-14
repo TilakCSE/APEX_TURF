@@ -317,3 +317,106 @@ select {
     gap: 10px;
     margin-top: 24px;
 }
+
+/* === Dynamic Slot Picker Styles === */
+.slot-picker {
+    margin-top: 2rem;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.day-selector {
+    display: flex;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--border-color);
+    padding: 8px;
+    gap: 8px;
+}
+
+.day-btn {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--muted);
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.day-btn span {
+    display: block;
+    font-size: 12px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.day-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text);
+}
+
+.day-btn.active {
+    background-color: var(--primary);
+    color: white;
+    font-weight: bold;
+}
+
+.slot-container {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.slot {
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: none;
+    color: var(--text);
+    cursor: pointer;
+    text-align: center;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.slot.available:hover {
+    border-color: var(--primary);
+    background-color: rgba(79, 70, 229, 0.1);
+    color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.2); /* Glow effect */
+}
+
+.slot.booked {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--muted);
+    cursor: not-allowed;
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+.loader {
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-left-color: var(--primary);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 40px auto;
+}
+
+.slot-error {
+    color: var(--muted);
+    text-align: center;
+    grid-column: 1 / -1;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}

@@ -11,6 +11,7 @@ import org.example.service.BookingService;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime; // <-- Make sure this import is present
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -24,9 +25,14 @@ public class BookingApiServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             long turfId = Long.parseLong(req.getParameter("turfId"));
-            // FullCalendar sends dates in ISO 8601 format, which LocalDateTime can parse directly
-            LocalDateTime start = LocalDateTime.parse(req.getParameter("start"));
-            LocalDateTime end = LocalDateTime.parse(req.getParameter("end"));
+
+            // CORRECTED: Use OffsetDateTime to handle the timezone from FullCalendar
+            OffsetDateTime startODT = OffsetDateTime.parse(req.getParameter("start"));
+            OffsetDateTime endODT = OffsetDateTime.parse(req.getParameter("end"));
+
+            // Convert to LocalDateTime for the rest of your application
+            LocalDateTime start = startODT.toLocalDateTime();
+            LocalDateTime end = endODT.toLocalDateTime();
 
             List<Booking> bookings = bookingService.getBookingsForCalendar(turfId, start, end);
 
@@ -37,11 +43,10 @@ public class BookingApiServlet extends HttpServlet {
                     "end", booking.getEndTime().toString()
             )).collect(Collectors.toList());
 
-            // Set response type to JSON and write the data
             resp.setContentType("application/json");
-
             resp.setCharacterEncoding("UTF-8");
             resp.getWriter().write(gson.toJson(events));
+
         } catch (Exception e) {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error fetching booking data.");
             e.printStackTrace();
